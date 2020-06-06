@@ -22,6 +22,7 @@ gem 'puma', '~> 4.1'
 # gem 'image_processing', '~> 1.2'
 
 # Reduces boot times through caching; required in config/boot.rb
+gem 'bcrypt', '~> 3.1.13'
 gem 'bootsnap', '>= 1.4.2', require: false
 gem 'graphql', '1.9.17'
 
