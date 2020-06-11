@@ -1,0 +1,65 @@
+version: "3.7"
+
+services:
+  ms-mysql-db:
+    container_name: ms-mysql-db
+    build: ./database
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - ${DATABASE_PORT}:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ms-freetime-network
+
+  analytic-data-service:
+    container_name: ms-analytic-data-service
+    build: ./analytic-data-service
+    command: run --unstable --allow-net --allow-env --allow-read app.ts
+    environment:
+      DB_USER: ${ANALYTIC_DATA_SERVICE_USER}
+      DB_NAME: ${ANALYTIC_DATA_SERVICE_DB}
+      DB_PASSWORD: ${ANALYTIC_DATA_SERVICE_PASSWORD}
+      DB_PORT: ${DATABASE_PORT}
+    volumes:
+      - ./analytic-data-service:/usr/app
+    ports:
+      - ${ANALYTIC_DATA_SERVICE_PORT}:3000
+    depends_on:
+      - ms-mysql-db
+    networks:
+      - ms-freetime-network
+
+  ms-core-service:
+    container_name: ms-core-service
+    build: ./ms-core-service
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./ms-core-service:/myapp
+    ports:
+      - ${MS_CORE_SERVICE_PORT}:3000
+    depends_on:
+      - ms-mysql-db
+
+  ms-php-myadmin:
+    container_name: ms-php-myadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: ms-mysql-db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - ${MS_PHP_MYADMIN_PORT}:80
+    networks:
+      - ms-freetime-network
+    depends_on:
+      - ms-mysql-db
+
+networks:
+  ms-freetime-network:
+    driver: overlay
+    attachable: true
+
+volumes:
+  mysql_data:
