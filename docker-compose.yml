@@ -42,6 +42,8 @@ services:
       - ${MS_CORE_SERVICE_PORT}:3000
     depends_on:
       - ms-mysql-db
+    networks:
+      - ms-freetime-network
 
   ms-php-myadmin:
     container_name: ms-php-myadmin
@@ -55,6 +57,19 @@ services:
       - ms-freetime-network
     depends_on:
       - ms-mysql-db
+
+  data-science-service:
+    container_name: data-science-service
+    build: ./data-science-service
+    volumes:
+      - ./data-science-service:/code
+    ports:
+      - ${DATA_SCIENCE_SERVICE_PORT}:8000
+    depends_on:
+      - ms-mysql-db
+    networks:
+      - ms-freetime-network
+    command: bash -c "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
 networks:
   ms-freetime-network:
