@@ -9,20 +9,35 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - ${DATABASE_PORT}:3306
+      - ${MYSQL_DATABASE_PORT}:3306
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ms-freetime-network
+  ms-mongo-db:
+    image: mongo:4.2.7
+    container_name: ms-mongo-db
+    # restart: always
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - ${MONGO_DATABASE_PORT}:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${ANALYTIC_DATA_SERVICE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${ANALYTIC_DATA_SERVICE_PASSWORD}
+      MONGO_INITDB_DATABASE: ${ANALYTIC_DATA_SERVICE_DB}
     networks:
       - ms-freetime-network
 
   analytic-data-service:
     container_name: ms-analytic-data-service
     build: ./analytic-data-service
-    command: run --unstable --allow-net --allow-env --allow-read app.ts
+    command: run --unstable --allow-net --allow-write --allow-env --allow-read -c tsconfig.json app.ts
     environment:
-      DB_USER: ${ANALYTIC_DATA_SERVICE_USER}
-      DB_NAME: ${ANALYTIC_DATA_SERVICE_DB}
-      DB_PASSWORD: ${ANALYTIC_DATA_SERVICE_PASSWORD}
-      DB_PORT: ${DATABASE_PORT}
+      ANALYTIC_DB_USER: ${ANALYTIC_DATA_SERVICE_USER}
+      ANALYTIC_DB_NAME: ${ANALYTIC_DATA_SERVICE_DB}
+      ANALYTIC_DB_PASSWORD: ${ANALYTIC_DATA_SERVICE_PASSWORD}
+      ANALYTIC_DB_PORT: ${ANALYTIC_DATA_SERVICE_PORT}
+      ANALYTIC_DB_HOST: ${ANALYTIC_DATA_SERVICE_HOST}
     volumes:
       - ./analytic-data-service:/usr/app
     ports:
@@ -78,3 +93,4 @@ networks:
 
 volumes:
   mysql_data:
+  mongo_data:

@@ -1,0 +1,15 @@
+scripts:
+  start:
+    # file: app.ts
+    deno_options:
+      unstable: true
+
+  db:
+    file: https://deno.land/x/nessie/cli.ts
+
+globals:
+  deno_options:
+    allow-net: true
+    allow-read: true
+    allow-write: true
+    allow-env: true
