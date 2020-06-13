@@ -33,7 +33,7 @@ class PhotoModel extends BaseModel {
   url!: string;
 
   @Field({ type: FieldType.INT, notNull: true })
-  user_id!: number;
+  user_id!: BigInt;
 }
 
 export default PhotoModel;

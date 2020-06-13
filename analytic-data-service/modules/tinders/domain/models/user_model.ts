@@ -18,7 +18,7 @@ class UserModel extends BaseModel {
     length: 11,
     autoIncrement: true,
   })
-  id!: number;
+  id!: BigInt;
 
   // We use ! since name is never null
   @Field({ type: FieldType.STRING, length: 50, notNull: false })
@@ -33,8 +33,8 @@ class UserModel extends BaseModel {
   @Field({ type: FieldType.INT, default: 0 })
   distance_mi?: number;
 
-  @Field({ type: FieldType.DATE })
-  birthDate?: Date;
+  @Field({ type: FieldType.INT, default: Date.now() })
+  birth_date?: BigInt;
 }
 
 export default UserModel;
