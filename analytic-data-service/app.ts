@@ -5,23 +5,38 @@ import logger from "./middleware/logger.ts";
 import error from "./middleware/error.ts";
 import { success } from "./common/responses.ts";
 import { initOrm } from "./modules/core/orm.config.ts";
+import { sync_recs_user_from_tinder_api_job } from "./modules/tinders/jobs/sync_recs_user_from_tinder_api_job.ts";
 
-const app = new Application();
-const router = new Router();
+const runBackgroundJob = async () => {
+  await sync_recs_user_from_tinder_api_job();
+};
 
-// middleware
-app.use(logger);
-app.use(timer);
-app.use(error);
+const runMiddleware = (app: Application) => {
+  app.use(logger);
+  app.use(timer);
+  app.use(error);
+};
 
-// init database
-await initOrm();
+const main = async () => {
+  const app = new Application();
+  const router = new Router();
 
-router.get("/", (ctx) => {
-  return success(ctx, null);
-});
+  // middleware
+  runMiddleware(app);
 
-app.use(router.routes());
+  // init database
+  await initOrm();
+  // run background job
+  await runBackgroundJob();
 
-console.log("app running -> http://localhost:3000");
-await app.listen({ port: 3000 });
+  router.get("/", (ctx) => {
+    return success(ctx, null);
+  });
+
+  app.use(router.routes());
+
+  console.log("app running -> http://localhost:3000");
+  await app.listen({ port: 3000 });
+};
+
+await main();

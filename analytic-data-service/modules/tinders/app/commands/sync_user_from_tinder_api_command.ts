@@ -6,8 +6,7 @@ import { getStringOrDefault } from "../../../../common/strings.ts";
 
 const sync_user_from_tinder_api_command = async () => {
   const user_recs_data = await get_user_rects();
-
-  const result: any = await dso.transaction<boolean>(async (trans) => {
+  const transaction = dso.transaction(async (trans) => {
     user_recs_data.forEach(async (user_data: any) => {
       try {
         const refId: string = user_data["_id"];
@@ -17,9 +16,6 @@ const sync_user_from_tinder_api_command = async () => {
 
         if (existedUser) {
           // TODO sync data
-          console.log(
-            `User with refId ${refId} is existed in the system.`,
-          );
         } else {
           const user_id = await user_repo.insert({
             refId: user_data["_id"],
@@ -48,10 +44,9 @@ const sync_user_from_tinder_api_command = async () => {
         console.error(error);
       }
     });
-    return true;
   });
 
-  return true;
+  return await transaction;
 };
 
 export default sync_user_from_tinder_api_command;

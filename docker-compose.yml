@@ -4,6 +4,7 @@ services:
   ms-mysql-db:
     container_name: ms-mysql-db
     build: ./database
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
@@ -30,14 +31,17 @@ services:
 
   analytic-data-service:
     container_name: ms-analytic-data-service
+    restart: always
     build: ./analytic-data-service
-    command: run --unstable --allow-net --allow-write --allow-env --allow-read -c tsconfig.json app.ts
+    command: run --allow-net --allow-read --allow-write --allow-env --unstable -c tsconfig.json app.ts
     environment:
       ANALYTIC_DB_USER: ${ANALYTIC_DATA_SERVICE_USER}
       ANALYTIC_DB_NAME: ${ANALYTIC_DATA_SERVICE_DB}
       ANALYTIC_DB_PASSWORD: ${ANALYTIC_DATA_SERVICE_PASSWORD}
-      ANALYTIC_DB_PORT: ${ANALYTIC_DATA_SERVICE_PORT}
-      ANALYTIC_DB_HOST: ${ANALYTIC_DATA_SERVICE_HOST}
+      # ANALYTIC_DB_PORT: ${ANALYTIC_DATA_SERVICE_DB_PORT}
+      # ANALYTIC_DB_HOST: ${ANALYTIC_DATA_SERVICE_HOST}
+      ANALYTIC_DB_PORT: 3306
+      ANALYTIC_DB_HOST: ms-mysql-db
     volumes:
       - ./analytic-data-service:/usr/app
     ports:
