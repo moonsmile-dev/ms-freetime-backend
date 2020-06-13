@@ -37,4 +37,31 @@ class UserModel extends BaseModel {
   birthDate?: Date;
 }
 
-export { UserModel };
+@Model("photos")
+class PhotoModel extends BaseModel {
+  @Field(
+    { type: FieldType.INT, primary: true, length: 11, autoIncrement: true },
+  )
+  id!: number;
+
+  @Field(
+    {
+      type: FieldType.STRING,
+      length: 30,
+      notNull: true,
+    },
+  )
+  refId!: string;
+
+  @Field({
+    type: FieldType.STRING,
+    length: 500,
+    notNull: true,
+  })
+  url!: string;
+
+  @Field({ type: FieldType.INT, notNull: true })
+  user_id!: number;
+}
+
+export { UserModel, PhotoModel };
