@@ -6,9 +6,11 @@ import error from "./middleware/error.ts";
 import { success } from "./common/responses.ts";
 import { initOrm } from "./modules/core/orm.config.ts";
 import { sync_recs_user_from_tinder_api_job } from "./modules/tinders/jobs/sync_recs_user_from_tinder_api_job.ts";
+import { sync_mediafile_to_system_job } from "./modules/tinders/jobs/sync_mediafile_to_system_job.ts";
 
 const runBackgroundJob = async () => {
   await sync_recs_user_from_tinder_api_job();
+  await sync_mediafile_to_system_job();
 };
 
 const runMiddleware = (app: Application) => {

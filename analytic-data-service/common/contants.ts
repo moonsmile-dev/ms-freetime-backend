@@ -8,3 +8,6 @@ export const DB_NAME: string = Deno.env.get("ANALYTIC_DB_NAME") ?? "";
 
 // TINDER API
 export const USER_RECS_API = "https://api.gotinder.com/user/recs";
+
+// Media
+export const MEDIA_FILE_DIR = "./mediafiles";
