@@ -3,6 +3,7 @@ import user_repo from "../../domain/repositories/user_repo.ts";
 import { dso, Where } from "https://deno.land/x/dso@v1.0.0/mod.ts";
 import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { getStringOrDefault } from "../../../../common/strings.ts";
+import { GENDER_MALE, GENDER_FEMALE } from "../../domain/contants.ts";
 
 const sync_user_from_tinder_api_command = async () => {
   const user_recs_data = await get_user_rects();
@@ -10,11 +11,12 @@ const sync_user_from_tinder_api_command = async () => {
     user_recs_data.forEach(async (user_data: any) => {
       try {
         const refId: string = user_data["_id"];
+        const gender: number = Number(user_data["gender"] ?? 0);
         const existedUser = await user_repo.findOne(
-          Where.from({ ref_id: refId }),
+          Where.from({ ref_id: refId })
         );
 
-        if (existedUser) {
+        if (existedUser && gender === GENDER_FEMALE) {
           // TODO sync data
         } else {
           const user_id = await user_repo.insert({
@@ -23,9 +25,8 @@ const sync_user_from_tinder_api_command = async () => {
             bio: getStringOrDefault(user_data, "bio", "").slice(0, 200),
             distance_mi: user_data["distance_mi"],
             birth_date: BigInt(
-              Date.parse(
-                user_data["birth_date"] ?? Date.now().toString(),
-              ) ?? Date.now(),
+              Date.parse(user_data["birth_date"] ?? Date.now().toString()) ??
+                Date.now()
             ),
           });
 
