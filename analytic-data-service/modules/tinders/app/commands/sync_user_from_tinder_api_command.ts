@@ -1,9 +1,10 @@
 import get_user_recs from "../../services/get_user_recs.ts";
 import user_repo from "../../domain/repositories/user_repo.ts";
-import { dso, Where } from "https://deno.land/x/dso@v1.0.0/mod.ts";
+
 import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { getStringOrDefault } from "../../../../common/strings.ts";
 import { GENDER_MALE, GENDER_FEMALE } from "../../domain/contants.ts";
+import { Where, dso } from "../../../../deps.ts";
 
 const sync_user_from_tinder_api_command = async () => {
   const user_recs_data = await get_user_recs();

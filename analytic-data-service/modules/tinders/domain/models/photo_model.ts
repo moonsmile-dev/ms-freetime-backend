@@ -1,13 +1,4 @@
-import {
-  BaseModel,
-  Defaults,
-  dso,
-  Field,
-  FieldType,
-  Join,
-  Model,
-  Where,
-} from "https://deno.land/x/dso@v1.0.0/mod.ts";
+import { Model, BaseModel, Field, FieldType } from "../../../../deps.ts";
 
 @Model("photos")
 class PhotoModel extends BaseModel {

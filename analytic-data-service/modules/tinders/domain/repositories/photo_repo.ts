@@ -1,5 +1,5 @@
-import { dso } from "https://deno.land/x/dso@v1.0.0/mod.ts";
 import PhotoModel from "../models/photo_model.ts";
+import { dso } from "../../../../deps.ts";
 
 const photo_repo = dso.define(PhotoModel);
 

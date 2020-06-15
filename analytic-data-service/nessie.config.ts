@@ -1,6 +1,3 @@
-import { ClientPostgreSQL } from "https://deno.land/x/nessie/mod.ts";
-import { ClientMySQL } from "https://deno.land/x/nessie/mod.ts";
-import { ClientSQLite } from "https://deno.land/x/nessie/mod.ts";
 import {
   DB_HOSTNAME,
   DB_PORT,
@@ -8,6 +5,7 @@ import {
   DB_PASSWORD,
   DB_NAME,
 } from "./common/contants.ts";
+import { ClientMySQL } from "./deps.ts";
 
 /** These are the default config options. */
 const clientOptions = {

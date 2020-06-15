@@ -1,4 +1,4 @@
-import { isHttpError, Status } from "https://deno.land/x/oak/mod.ts";
+import { Status, isHttpError } from "../deps.ts";
 
 export default async (ctx: any, next: any) => {
   try {

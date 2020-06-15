@@ -1,5 +1,3 @@
-import { Application, Router, Status } from "https://deno.land/x/oak/mod.ts";
-
 import timer from "./middleware/timer.ts";
 import logger from "./middleware/logger.ts";
 import error from "./middleware/error.ts";
@@ -7,10 +5,17 @@ import { success } from "./common/responses.ts";
 import { initOrm } from "./modules/core/orm.config.ts";
 import { sync_recs_user_from_tinder_api_job } from "./modules/tinders/jobs/sync_recs_user_from_tinder_api_job.ts";
 import { sync_mediafile_to_system_job } from "./modules/tinders/jobs/sync_mediafile_to_system_job.ts";
+import { IJobHandler, JobHandler } from "./modules/tinders/jobs/jobHandler.ts";
+import { Application, Router } from "./deps.ts";
 
 const runBackgroundJob = async () => {
-  await sync_recs_user_from_tinder_api_job();
-  await sync_mediafile_to_system_job();
+  const jobHandler: IJobHandler = new JobHandler();
+  jobHandler.run(sync_mediafile_to_system_job);
+  jobHandler.run(
+    sync_recs_user_from_tinder_api_job,
+  );
+  // await sync_recs_user_from_tinder_api_job();
+  // await sync_mediafile_to_system_job();
 };
 
 const runMiddleware = (app: Application) => {

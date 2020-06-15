@@ -1,7 +1,6 @@
-import { ensureDir, ensureDirSync } from "https://deno.land/std/fs/mod.ts";
 import { MEDIA_FILE_DIR } from "../../../../common/contants.ts";
 import photo_repo from "../../domain/repositories/photo_repo.ts";
-import { dso, Where } from "https://deno.land/x/dso@v1.0.0/mod.ts";
+import { ensureDir, Where } from "../../../../deps.ts";
 
 const sync_medifile_to_system_command = async () => {
   await ensureDir(MEDIA_FILE_DIR);

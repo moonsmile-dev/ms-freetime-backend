@@ -1,4 +1,3 @@
-import { dso } from "https://deno.land/x/dso@v1.0.0/mod.ts";
 import {
   DB_HOSTNAME,
   DB_PORT,
@@ -6,6 +5,7 @@ import {
   DB_PASSWORD,
   DB_NAME,
 } from "../../common/contants.ts";
+import { dso } from "../../deps.ts";
 
 export const initOrm = async () => {
   dso.connect({

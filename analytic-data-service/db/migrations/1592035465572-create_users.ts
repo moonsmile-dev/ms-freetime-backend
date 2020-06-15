@@ -1,6 +1,4 @@
-import { Migration } from "https://deno.land/x/nessie/mod.ts";
-import { Schema } from "https://deno.land/x/nessie/qb.ts";
-import Dex from "https://deno.land/x/dex/mod.ts";
+import { Migration, Schema } from "../../deps.ts";
 
 export const up: Migration<Schema> = ({ queryBuilder }) => {
   queryBuilder.create("users", (table) => {

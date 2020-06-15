@@ -1,4 +1,4 @@
-import { Status } from "https://deno.land/x/oak/mod.ts";
+import { Status } from "../deps.ts";
 
 const success = (ctx: any, data: any) => {
   ctx.response.status = Status.OK;
