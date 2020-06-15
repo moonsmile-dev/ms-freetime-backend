@@ -1,7 +1,7 @@
 import { FB_TOKEN, USER_RECS_API } from "../../../common/contants.ts";
 import user_repo from "../domain/repositories/user_repo.ts";
 
-const get_user_rects = async () => {
+const get_user_recs = async () => {
   const recs_response = await fetch(USER_RECS_API, {
     method: "GET",
     headers: {
@@ -17,4 +17,4 @@ const get_user_rects = async () => {
   throw Error(`Can't connect to Tinder API: ${USER_RECS_API}`);
 };
 
-export default get_user_rects;
+export default get_user_recs;
