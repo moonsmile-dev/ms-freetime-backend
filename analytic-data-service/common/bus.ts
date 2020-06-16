@@ -23,7 +23,7 @@ class Bus {
 }
 
 class Command {
-  public handler = () => null;
+  public handler = () => {};
 }
 
 class CommandHandler {

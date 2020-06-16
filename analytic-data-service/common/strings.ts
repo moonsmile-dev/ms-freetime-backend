@@ -22,4 +22,11 @@ function getStringOrDefault(dictData: any, key: any, _default: any): any {
   }
 }
 
-export { getStringOrDefault };
+function FormatString(str: string, ...val: string[]) {
+  for (let index = 0; index < val.length; index++) {
+    str = str.replace(`{${index}}`, val[index]);
+  }
+  return str;
+}
+
+export { getStringOrDefault, FormatString };

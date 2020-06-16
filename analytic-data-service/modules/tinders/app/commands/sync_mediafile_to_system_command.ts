@@ -1,12 +1,13 @@
 import { MEDIA_FILE_DIR } from "../../../../common/contants.ts";
 import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { ensureDir, Where } from "../../../../deps.ts";
+import { PHOTO_STATUS_LIKE } from "../../domain/contants.ts";
 
 const sync_medifile_to_system_command = async () => {
   await ensureDir(MEDIA_FILE_DIR);
 
   const photos = await photo_repo.findAll(
-    Where.expr("is_synced = 0 and is_favorited != 0"),
+    Where.expr(`is_synced = 0 and status = ${PHOTO_STATUS_LIKE}`),
   );
   if (photos.length > 0) {
     const synced_photo = photos[0];

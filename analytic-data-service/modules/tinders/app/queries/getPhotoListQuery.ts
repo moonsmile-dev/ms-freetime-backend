@@ -3,6 +3,7 @@ import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { Where } from "../../../../deps.ts";
 import PhotoDTO from "../dtos/photoDto.ts";
 import { ListPaging } from "../../../../common/paging.ts";
+import { PHOTO_STATUS_NORMAL } from "../../domain/contants.ts";
 
 class GetPhotoListQuery extends Query {
   start: number = -1;
@@ -22,7 +23,9 @@ class GetPhotoListQueryHandler extends QueryHandler {
     const start = query.start;
     const end = query.end;
 
-    const photos = await photo_repo.findAll(Where.expr("is_favorited = 0"));
+    const photos = await photo_repo.findAll(
+      Where.expr(`status = ${PHOTO_STATUS_NORMAL}`),
+    );
 
     const photoDtos: Array<PhotoDTO> = photos.slice(start, end).map((item) => {
       return {

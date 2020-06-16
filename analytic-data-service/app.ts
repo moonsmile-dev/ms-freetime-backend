@@ -5,14 +5,17 @@ import { success } from "./common/responses.ts";
 import { initOrm } from "./modules/core/orm.config.ts";
 import { sync_recs_user_from_tinder_api_job } from "./modules/tinders/jobs/sync_recs_user_from_tinder_api_job.ts";
 import { sync_mediafile_to_system_job } from "./modules/tinders/jobs/sync_mediafile_to_system_job.ts";
-import { IJobHandler, JobHandler } from "./modules/tinders/jobs/jobHandler.ts";
+
 import { Application, Router, oakCors } from "./deps.ts";
 import tinderRouter from "./modules/tinders/routes.ts";
+import { IJobHandler, JobHandler } from "./common/jobHandler.ts";
+import clearUserDataJob from "./modules/tinders/jobs/clearUserDataJob.ts";
 
 const runBackgroundJob = async () => {
   const jobHandler: IJobHandler = new JobHandler();
   jobHandler.run(sync_mediafile_to_system_job);
   jobHandler.run(sync_recs_user_from_tinder_api_job);
+  jobHandler.run(clearUserDataJob);
   // await sync_recs_user_from_tinder_api_job();
   // await sync_mediafile_to_system_job();
 };
@@ -28,7 +31,7 @@ const settingCors = (app: Application) => {
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       preflightContinue: false,
       optionsSuccessStatus: 204,
-    })
+    }),
   );
 };
 
