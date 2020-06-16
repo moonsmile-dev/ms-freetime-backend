@@ -2,18 +2,19 @@ import { Model, BaseModel, Field, FieldType } from "../../../../deps.ts";
 
 @Model("photos")
 class PhotoModel extends BaseModel {
-  @Field(
-    { type: FieldType.INT, primary: true, length: 11, autoIncrement: true },
-  )
+  @Field({
+    type: FieldType.INT,
+    primary: true,
+    length: 11,
+    autoIncrement: true,
+  })
   id!: number;
 
-  @Field(
-    {
-      type: FieldType.STRING,
-      length: 30,
-      notNull: true,
-    },
-  )
+  @Field({
+    type: FieldType.STRING,
+    length: 30,
+    notNull: true,
+  })
   refId!: string;
 
   @Field({
