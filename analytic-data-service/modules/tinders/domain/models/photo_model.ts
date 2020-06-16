@@ -27,8 +27,8 @@ class PhotoModel extends BaseModel {
   @Field({ type: FieldType.INT, notNull: true })
   user_id!: BigInt;
 
-  @Field({ type: FieldType.BOOLEAN, notNull: true, default: false })
-  is_favorited!: boolean;
+  @Field({ type: FieldType.INT, notNull: true, default: 0 })
+  status!: number;
 
   @Field({ type: FieldType.INT, notNull: true, default: 0 })
   is_synced!: number;

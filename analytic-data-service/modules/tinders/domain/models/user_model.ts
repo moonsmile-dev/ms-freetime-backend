@@ -26,6 +26,9 @@ class UserModel extends BaseModel {
 
   @Field({ type: FieldType.INT, default: Date.now() })
   birth_date?: BigInt;
+
+  @Field({ name: "status", type: FieldType.INT, default: 0 })
+  status!: number;
 }
 
 export default UserModel;
