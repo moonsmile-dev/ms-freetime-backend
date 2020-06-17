@@ -9,13 +9,25 @@ const sync_medifile_to_system_command = async () => {
   const photos = await photo_repo.findAll(
     Where.expr(`is_synced = 0 and status = ${PHOTO_STATUS_LIKE}`),
   );
-  if (photos.length > 0) {
-    const synced_photo = photos[0];
+
+  console.log(
+    `Syncing ${photos.length} photos to the system at ${new Date()}.`,
+  );
+
+  let photoCounter: number = 0;
+  photos.forEach(async (synced_photo) => {
     await write_file_url_to_disk(synced_photo.url ?? "", MEDIA_FILE_DIR);
 
     synced_photo.is_synced = 1;
     await photo_repo.update(synced_photo);
-  }
+
+    photoCounter++;
+    if (photoCounter === photos.length) {
+      console.log(
+        `Synced ${photoCounter} photos to the system at ${new Date()}.`,
+      );
+    }
+  });
 };
 
 const write_file_url_to_disk = async (file_url: string, file_path: string) => {
