@@ -2,12 +2,16 @@ import {
   USER_PASS_API,
   AUTH_TOKEN,
   USER_LIKE_API,
+  USER_LOCATION_API,
 } from "../../../common/contants.ts";
 import { FormatString } from "../../../common/strings.ts";
 
 interface IUserService {
   hateUserAction: (userId: string) => Promise<boolean>;
   loveUserAction: (userId: string) => Promise<boolean>;
+  changeLocationAction: (
+    data: { lat: number; lon: number },
+  ) => Promise<boolean>;
 }
 
 class UserService implements IUserService {
@@ -31,7 +35,7 @@ class UserService implements IUserService {
         },
       });
 
-      if (res.status < 200 && res.status >= 300) {
+      if (res.status < 200 || res.status >= 300) {
         console.log(`Can't implement hating user with id: ${userId}`);
         return false;
       }
@@ -57,7 +61,7 @@ class UserService implements IUserService {
         },
       });
 
-      if (res.status < 200 && res.status >= 300) {
+      if (res.status < 200 || res.status >= 300) {
         console.log(`Can't implement liking user with id: ${userId}`);
         return false;
       }
@@ -66,6 +70,35 @@ class UserService implements IUserService {
       return false;
     }
 
+    return true;
+  };
+
+  changeLocationAction = async (
+    data: { lat: number; lon: number },
+  ): Promise<boolean> => {
+    console.log(`Implementing change user location: ${JSON.stringify(data)}`);
+
+    try {
+      const res = await fetch(USER_LOCATION_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Auth-Token": AUTH_TOKEN,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (res.status < 200 || res.status >= 300) {
+        console.log(
+          `Can't hanle changing user location to ${JSON.stringify(data)}`,
+        );
+
+        return false;
+      }
+    } catch (error) {
+      console.log(`Can't change location to ${JSON.stringify(data)}`);
+      return false;
+    }
     return true;
   };
 }

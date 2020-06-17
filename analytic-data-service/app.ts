@@ -11,6 +11,9 @@ import tinderRouter from "./modules/tinders/routes.ts";
 import { IJobHandler, JobHandler } from "./common/jobHandler.ts";
 import clearUserDataJob from "./modules/tinders/jobs/clearUserDataJob.ts";
 import syncReactingUserJob from "./modules/tinders/jobs/syncReactingUserJob.ts";
+import changeUserLocationJob from "./modules/tinders/jobs/changeUserLocationJob.ts";
+import { Bus } from "./common/bus.ts";
+import ChangeUserLocationCommand from "./modules/tinders/app/commands/changeUserLocationCommand.ts";
 
 const runBackgroundJob = async () => {
   const jobHandler: IJobHandler = new JobHandler();
@@ -18,6 +21,7 @@ const runBackgroundJob = async () => {
   jobHandler.run(sync_recs_user_from_tinder_api_job);
   jobHandler.run(clearUserDataJob);
   jobHandler.run(syncReactingUserJob);
+  jobHandler.run(changeUserLocationJob);
   // await sync_recs_user_from_tinder_api_job();
   // await sync_mediafile_to_system_job();
 };
@@ -43,6 +47,13 @@ const runMiddleware = (app: Application) => {
   app.use(error);
 };
 
+const onStartUp = async () => {
+  const bus: Bus = new Bus();
+
+  // change user location
+  await bus.dispatch(new ChangeUserLocationCommand());
+};
+
 const main = async () => {
   const app = new Application();
   const router = new Router();
@@ -53,6 +64,9 @@ const main = async () => {
   runRouters(app);
   // cors
   settingCors(app);
+
+  // on start up
+  await onStartUp();
 
   // init database
   await initOrm();
