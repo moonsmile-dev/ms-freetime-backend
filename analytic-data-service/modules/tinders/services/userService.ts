@@ -1,4 +1,4 @@
-import { USER_PASS_API, FB_TOKEN } from "../../../common/contants.ts";
+import { USER_PASS_API, AUTH_TOKEN } from "../../../common/contants.ts";
 import { FormatString } from "../../../common/strings.ts";
 
 interface IUserService {
@@ -15,7 +15,7 @@ class UserService implements IUserService {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": FB_TOKEN,
+          "X-Auth-Token": AUTH_TOKEN,
         },
       });
 

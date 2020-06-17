@@ -2,7 +2,11 @@ import { Command, CommandHandler } from "../../../../common/bus.ts";
 import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { Where } from "../../../../deps.ts";
 import user_repo from "../../domain/repositories/user_repo.ts";
-import { PHOTO_STATUS_HATE } from "../../domain/contants.ts";
+import {
+  PHOTO_STATUS_HATE,
+  PHOTO_STATUS_NORMAL,
+  USER_STATUS_DRAFT,
+} from "../../domain/contants.ts";
 import { IUserService, UserService } from "../../services/userService.ts";
 
 class ClearUserDataCommand extends Command {
@@ -21,7 +25,9 @@ class ClearUserDataCommandHandler extends CommandHandler {
   handle = async (command: ClearUserDataCommand) => {
     // delete failed photo
     console.log(`Deleting failed photos at ${new Date()}`);
-    const photos = await photo_repo.findAll(Where.expr("id is not null"));
+    const photos = await photo_repo.findAll(
+      Where.expr(`status = ${PHOTO_STATUS_NORMAL}`),
+    );
     photos.forEach(async (photo) => {
       try {
         const res = await fetch(photo.url ?? "");
@@ -41,7 +47,9 @@ class ClearUserDataCommandHandler extends CommandHandler {
 
     // Delete user don't have image
     console.log(`Deleting users don't have any photos at ${new Date()}`);
-    const partners = await user_repo.findAll(Where.expr("id is not null"));
+    const partners = await user_repo.findAll(
+      Where.expr(`status = ${USER_STATUS_DRAFT}`),
+    );
 
     partners.forEach(async (partner) => {
       const photosOfUser = await photo_repo.findAll(

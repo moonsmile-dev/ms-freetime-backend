@@ -1,4 +1,4 @@
-import { FB_TOKEN, USER_RECS_API } from "../../../common/contants.ts";
+import { AUTH_TOKEN, USER_RECS_API } from "../../../common/contants.ts";
 import user_repo from "../domain/repositories/user_repo.ts";
 
 const get_user_recs = async () => {
@@ -6,7 +6,7 @@ const get_user_recs = async () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "X-Auth-Token": FB_TOKEN,
+      "X-Auth-Token": AUTH_TOKEN,
     },
   });
   const response_data = await recs_response.json();

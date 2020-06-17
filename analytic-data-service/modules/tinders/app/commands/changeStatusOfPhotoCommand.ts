@@ -1,6 +1,10 @@
 import { Command, CommandHandler } from "../../../../common/bus.ts";
 import photo_repo from "../../domain/repositories/photo_repo.ts";
-import { PHOTO_STATUS_HATE, PHOTO_STATUS_LIKE } from "../../domain/contants.ts";
+import {
+  PHOTO_STATUS_HATE,
+  PHOTO_STATUS_LIKE,
+  PHOTO_STATUS_HIDE,
+} from "../../domain/contants.ts";
 
 class ChangeStatusOfPhotoCommand extends Command {
   status: number;
@@ -20,7 +24,11 @@ class ChangeStatusOfPhotoCommandHandler extends CommandHandler {
       throw Error(`Can't find the photo with id: ${command.photoId}`);
     }
 
-    if ([PHOTO_STATUS_HATE, PHOTO_STATUS_LIKE].includes(command.status)) {
+    if (
+      [PHOTO_STATUS_HATE, PHOTO_STATUS_LIKE, PHOTO_STATUS_HIDE].includes(
+        command.status,
+      )
+    ) {
       photo!.status = command.status;
 
       await photo_repo.update(photo!);

@@ -26,5 +26,4 @@ export {
 } from "https://deno.land/x/oak@v5.2.0/mod.ts";
 export { getQuery } from "https://deno.land/x/oak@v5.2.0/helpers.ts";
 export { oakCors } from "https://deno.land/x/cors/mod.ts";
-
 export * from "https://cdn.pika.dev/axios@0.19.2";

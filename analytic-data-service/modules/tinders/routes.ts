@@ -5,6 +5,6 @@ import testNewCommandAPI from "./api/testApi.ts";
 const tinderRouter = new Router();
 
 tinderRouter.get("/photos", oakCors(), getPhotoList);
-tinderRouter.post("/photos/:id/react", reactPhotoAPI);
+tinderRouter.post("/photos/:id/react", oakCors(), reactPhotoAPI);
 
 export default tinderRouter;
