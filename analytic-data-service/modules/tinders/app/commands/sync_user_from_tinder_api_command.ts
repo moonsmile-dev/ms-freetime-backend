@@ -3,7 +3,11 @@ import user_repo from "../../domain/repositories/user_repo.ts";
 
 import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { getStringOrDefault } from "../../../../common/strings.ts";
-import { GENDER_MALE, GENDER_FEMALE } from "../../domain/contants.ts";
+import {
+  GENDER_MALE,
+  GENDER_FEMALE,
+  USER_STATUS_DRAFT,
+} from "../../domain/contants.ts";
 import { Where, dso } from "../../../../deps.ts";
 
 const sync_user_from_tinder_api_command = async () => {
@@ -29,6 +33,7 @@ const sync_user_from_tinder_api_command = async () => {
               Date.parse(user_data["birth_date"] ?? Date.now().toString()) ??
                 Date.now(),
             ),
+            status: USER_STATUS_DRAFT,
           });
 
           user_data["photos"].forEach(async (photo_data: any) => {

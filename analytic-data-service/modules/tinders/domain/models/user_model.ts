@@ -1,4 +1,5 @@
 import { Model, BaseModel, Field, FieldType } from "../../../../deps.ts";
+import { USER_STATUS_DRAFT } from "../contants.ts";
 
 @Model("partners")
 class UserModel extends BaseModel {
@@ -27,7 +28,7 @@ class UserModel extends BaseModel {
   @Field({ type: FieldType.INT, default: Date.now() })
   birth_date?: BigInt;
 
-  @Field({ name: "status", type: FieldType.INT, default: 0 })
+  @Field({ name: "status", type: FieldType.INT, default: USER_STATUS_DRAFT })
   status!: number;
 }
 
