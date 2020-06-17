@@ -7,6 +7,7 @@ import {
   GENDER_MALE,
   GENDER_FEMALE,
   USER_STATUS_DRAFT,
+  PHOTO_STATUS_NORMAL,
 } from "../../domain/contants.ts";
 import { Where, dso } from "../../../../deps.ts";
 
@@ -43,6 +44,7 @@ const sync_user_from_tinder_api_command = async () => {
                 refId: refId,
                 url: photo_data["url"],
                 user_id: BigInt(user_id),
+                status: PHOTO_STATUS_NORMAL,
               });
             }
           });
