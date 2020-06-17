@@ -7,7 +7,6 @@ import VisibilityIcon from "@material-ui/icons/Visibility";
 
 const ImagePopup = (props: any) => {
   const [showDialog, setShowDialog] = React.useState(false);
-  console.log("ImagePopup", props);
 
   const handleCloseClick = (value: any) => {
     setShowDialog(false);
