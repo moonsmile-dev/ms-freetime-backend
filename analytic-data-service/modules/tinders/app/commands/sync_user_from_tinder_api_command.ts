@@ -13,7 +13,16 @@ import { Where, dso } from "../../../../deps.ts";
 
 const sync_user_from_tinder_api_command = async () => {
   const user_recs_data = await get_user_recs();
-  const transaction = dso.transaction(async (trans) => {
+  let updatedUserCounter: number = 0;
+  let addedUserCounter: number = 0;
+
+  const totalSyncedUser: number = user_recs_data.length;
+
+  const finisedLogging = (updated: number, added: number) => {
+    console.log(`${updated} users are updated and ${added} users are added.`);
+  };
+
+  await dso.transaction(async (trans) => {
     user_recs_data.forEach(async (user_data: any) => {
       try {
         const refId: string = user_data["_id"];
@@ -24,6 +33,11 @@ const sync_user_from_tinder_api_command = async () => {
 
         if (existedUser && gender === GENDER_FEMALE) {
           // TODO sync data
+
+          updatedUserCounter++;
+          if (updatedUserCounter + addedUserCounter === totalSyncedUser) {
+            finisedLogging(updatedUserCounter, addedUserCounter);
+          }
         } else {
           const user_id = await user_repo.insert({
             refId: user_data["_id"],
@@ -39,7 +53,9 @@ const sync_user_from_tinder_api_command = async () => {
 
           user_data["photos"].forEach(async (photo_data: any) => {
             const refId: string = String(photo_data["id"]).slice(0, 8);
-            if (refId !== "unknown") {
+            const resUrl = await fetch(photo_data["url"] ?? "");
+
+            if (refId !== "unknown" && resUrl.status === 200) {
               await photo_repo.insert({
                 refId: refId,
                 url: photo_data["url"],
@@ -48,14 +64,17 @@ const sync_user_from_tinder_api_command = async () => {
               });
             }
           });
+
+          addedUserCounter++;
+          if (addedUserCounter + updatedUserCounter === totalSyncedUser) {
+            finisedLogging(updatedUserCounter, addedUserCounter);
+          }
         }
       } catch (error) {
         console.error(error);
       }
     });
   });
-
-  return await transaction;
 };
 
 export default sync_user_from_tinder_api_command;
