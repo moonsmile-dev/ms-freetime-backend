@@ -10,6 +10,7 @@ export { ensureDir } from "https://deno.land/std/fs/mod.ts";
 export {
   hourly,
   everyMinute,
+  every15Minute,
 } from "https://deno.land/x/deno_cron@v1.0.0/cron.ts";
 
 // export * from "https://deno.land/x/nessie@v1.0.0/cli.ts";
