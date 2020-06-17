@@ -6,11 +6,17 @@ import {
 } from "../../../common/contants.ts";
 import { FormatString } from "../../../common/strings.ts";
 
+interface Location {
+  lat: number;
+  lon: number;
+  name: string;
+}
+
 interface IUserService {
   hateUserAction: (userId: string) => Promise<boolean>;
   loveUserAction: (userId: string) => Promise<boolean>;
   changeLocationAction: (
-    data: { lat: number; lon: number },
+    data: Location,
   ) => Promise<boolean>;
 }
 
@@ -74,9 +80,9 @@ class UserService implements IUserService {
   };
 
   changeLocationAction = async (
-    data: { lat: number; lon: number },
+    data: Location,
   ): Promise<boolean> => {
-    console.log(`Implementing change user location: ${JSON.stringify(data)}`);
+    console.log(`Implementing change user location: ${data.name}`);
 
     try {
       const res = await fetch(USER_LOCATION_API, {
@@ -90,13 +96,13 @@ class UserService implements IUserService {
 
       if (res.status < 200 || res.status >= 300) {
         console.log(
-          `Can't hanle changing user location to ${JSON.stringify(data)}`,
+          `Can't hanle changing user location to ${data.name}`,
         );
 
         return false;
       }
     } catch (error) {
-      console.log(`Can't change location to ${JSON.stringify(data)}`);
+      console.log(`Can't change location to ${data.name}`);
       return false;
     }
     return true;
