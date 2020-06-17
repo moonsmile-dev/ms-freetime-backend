@@ -10,12 +10,14 @@ import { Application, Router, oakCors } from "./deps.ts";
 import tinderRouter from "./modules/tinders/routes.ts";
 import { IJobHandler, JobHandler } from "./common/jobHandler.ts";
 import clearUserDataJob from "./modules/tinders/jobs/clearUserDataJob.ts";
+import syncReactingUserJob from "./modules/tinders/jobs/syncReactingUserJob.ts";
 
 const runBackgroundJob = async () => {
   const jobHandler: IJobHandler = new JobHandler();
   jobHandler.run(sync_mediafile_to_system_job);
   jobHandler.run(sync_recs_user_from_tinder_api_job);
   jobHandler.run(clearUserDataJob);
+  jobHandler.run(syncReactingUserJob);
   // await sync_recs_user_from_tinder_api_job();
   // await sync_mediafile_to_system_job();
 };
