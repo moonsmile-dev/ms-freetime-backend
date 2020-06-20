@@ -1,10 +1,13 @@
 import { Command, CommandHandler } from "../../../../common/bus.ts";
-import photo_repo from "../../domain/repositories/photo_repo.ts";
 import {
   PHOTO_STATUS_HATE,
   PHOTO_STATUS_LIKE,
   PHOTO_STATUS_HIDE,
 } from "../../domain/contants.ts";
+import {
+  IPhotoRepository,
+  PhotoRepository,
+} from "../../domain/repositories/photoRepository.ts";
 
 class ChangeStatusOfPhotoCommand extends Command {
   status: number;
@@ -18,8 +21,13 @@ class ChangeStatusOfPhotoCommand extends Command {
 }
 
 class ChangeStatusOfPhotoCommandHandler extends CommandHandler {
+  photoRepos: IPhotoRepository;
+  constructor(photoRepos: IPhotoRepository = new PhotoRepository()) {
+    super();
+    this.photoRepos = photoRepos;
+  }
   handle = async (command: ChangeStatusOfPhotoCommand) => {
-    const photo = await photo_repo.findById(command.photoId);
+    const photo = await this.photoRepos.findById(command.photoId);
     if (photo === null) {
       throw Error(`Can't find the photo with id: ${command.photoId}`);
     }
@@ -31,7 +39,7 @@ class ChangeStatusOfPhotoCommandHandler extends CommandHandler {
     ) {
       photo!.status = command.status;
 
-      await photo_repo.update(photo!);
+      await this.photoRepos.update(photo!);
     } else {
       throw Error(`The status ${command.status} isn't existed.`);
     }

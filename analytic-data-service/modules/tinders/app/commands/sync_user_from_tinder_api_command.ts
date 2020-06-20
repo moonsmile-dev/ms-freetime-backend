@@ -1,7 +1,5 @@
 import get_user_recs from "../../services/get_user_recs.ts";
-import user_repo from "../../domain/repositories/user_repo.ts";
 
-import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { getStringOrDefault } from "../../../../common/strings.ts";
 import {
   GENDER_MALE,
@@ -10,8 +8,19 @@ import {
   PHOTO_STATUS_NORMAL,
 } from "../../domain/contants.ts";
 import { Where, dso } from "../../../../deps.ts";
+import {
+  IUserRepository,
+  UserRepository,
+} from "../../domain/repositories/userRepository.ts";
+import {
+  IPhotoRepository,
+  PhotoRepository,
+} from "../../domain/repositories/photoRepository.ts";
 
-const sync_user_from_tinder_api_command = async () => {
+const sync_user_from_tinder_api_command = async (
+  userRepos: IUserRepository = new UserRepository(),
+  photoRepos: IPhotoRepository = new PhotoRepository(),
+) => {
   const user_recs_data = await get_user_recs();
   let updatedUserCounter: number = 0;
   let addedUserCounter: number = 0;
@@ -27,7 +36,7 @@ const sync_user_from_tinder_api_command = async () => {
       try {
         const refId: string = user_data["_id"];
         const gender: number = Number(user_data["gender"] ?? 0);
-        const existedUser = await user_repo.findOne(
+        const existedUser = await userRepos.findOne(
           Where.from({ ref_id: refId }),
         );
 
@@ -39,7 +48,7 @@ const sync_user_from_tinder_api_command = async () => {
             finisedLogging(updatedUserCounter, addedUserCounter);
           }
         } else {
-          const user_id = await user_repo.insert({
+          const user_id = await userRepos.insert({
             refId: user_data["_id"],
             name: user_data["name"],
             bio: getStringOrDefault(user_data, "bio", "").slice(0, 200),
@@ -53,15 +62,19 @@ const sync_user_from_tinder_api_command = async () => {
 
           user_data["photos"].forEach(async (photo_data: any) => {
             const refId: string = String(photo_data["id"]).slice(0, 8);
-            const resUrl = await fetch(photo_data["url"] ?? "");
+            try {
+              const resUrl = await fetch(photo_data["url"] ?? "");
 
-            if (refId !== "unknown" && resUrl.status === 200) {
-              await photo_repo.insert({
-                refId: refId,
-                url: photo_data["url"],
-                user_id: BigInt(user_id),
-                status: PHOTO_STATUS_NORMAL,
-              });
+              if (refId !== "unknown" && resUrl.status === 200) {
+                await photoRepos.insert({
+                  refId: refId,
+                  url: photo_data["url"],
+                  user_id: BigInt(user_id),
+                  status: PHOTO_STATUS_NORMAL,
+                });
+              }
+            } catch (error) {
+              console.log(`Can't request to url: ${photo_data["url"]}`);
             }
           });
 

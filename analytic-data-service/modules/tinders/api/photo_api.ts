@@ -1,5 +1,4 @@
 import PhotoModel from "../domain/models/photo_model.ts";
-import photo_repo from "../domain/repositories/photo_repo.ts";
 import { Where, getQuery } from "../../../deps.ts";
 import { success_paging, success } from "../../../common/responses.ts";
 import { Bus } from "../../../common/bus.ts";

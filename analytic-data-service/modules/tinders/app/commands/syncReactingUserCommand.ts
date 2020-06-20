@@ -1,6 +1,5 @@
 import { Command, CommandHandler } from "../../../../common/bus.ts";
 import { IUserService, UserService } from "../../services/userService.ts";
-import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { Where } from "../../../../deps.ts";
 import {
   PHOTO_STATUS_LIKE,
@@ -8,7 +7,15 @@ import {
   USER_STATUS_SYNCED,
   PHOTO_STATUS_HATE,
 } from "../../domain/contants.ts";
-import user_repo from "../../domain/repositories/user_repo.ts";
+import {
+  IUserRepository,
+  UserRepository,
+} from "../../domain/repositories/userRepository.ts";
+import {
+  IPhotoRepository,
+  PhotoRepository,
+} from "../../domain/repositories/photoRepository.ts";
+import PhotoModel from "../../domain/models/photo_model.ts";
 
 class SyncReactingUserCommand extends Command {
   handler = () => SyncReactingUserCommandHandler;
@@ -16,19 +23,26 @@ class SyncReactingUserCommand extends Command {
 
 class SyncReactingUserCommandHandler extends CommandHandler {
   userService: IUserService;
-  constructor(userService: IUserService = new UserService()) {
+  userRepos: IUserRepository;
+  photoRepos: IPhotoRepository;
+  constructor(
+    userService: IUserService = new UserService(),
+    userRepos: IUserRepository = new UserRepository(),
+    photoRepos: IPhotoRepository = new PhotoRepository(),
+  ) {
     super();
-
+    this.userRepos = userRepos;
     this.userService = userService;
+    this.photoRepos = photoRepos;
   }
   handle = async (command: SyncReactingUserCommand) => {
-    const reactedPhotos = await photo_repo.findAll(
+    const reactedPhotos = await this.photoRepos.findAll(
       Where.expr(
         `status = ${PHOTO_STATUS_LIKE} or status = ${PHOTO_STATUS_HATE}`,
       ),
     );
-    reactedPhotos.forEach(async (photo) => {
-      const partner = await user_repo.findOne(
+    reactedPhotos.forEach(async (photo: PhotoModel) => {
+      const partner = await this.userRepos.findOne(
         Where.expr(`id = ${photo.user_id} and status = ${USER_STATUS_DRAFT}`),
       );
 
@@ -45,7 +59,7 @@ class SyncReactingUserCommandHandler extends CommandHandler {
         }
         if (status === true) {
           partner!.status = USER_STATUS_SYNCED;
-          await user_repo.update(partner!);
+          await this.userRepos.update(partner!);
         }
       }
     });

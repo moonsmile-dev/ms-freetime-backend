@@ -1,13 +1,16 @@
 import { Command, CommandHandler } from "../../../../common/bus.ts";
-import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { Where } from "../../../../deps.ts";
-import user_repo from "../../domain/repositories/user_repo.ts";
 import {
   PHOTO_STATUS_HATE,
   PHOTO_STATUS_NORMAL,
   USER_STATUS_DRAFT,
 } from "../../domain/contants.ts";
 import { IUserService, UserService } from "../../services/userService.ts";
+import PhotoModel from "../../domain/models/photo_model.ts";
+import {
+  IPhotoRepository,
+  PhotoRepository,
+} from "../../domain/repositories/photoRepository.ts";
 
 class ClearUserDataCommand extends Command {
   constructor() {
@@ -18,17 +21,22 @@ class ClearUserDataCommand extends Command {
 
 class ClearUserDataCommandHandler extends CommandHandler {
   userService: IUserService;
-  constructor(userService: IUserService = new UserService()) {
+  photoRepos: IPhotoRepository;
+  constructor(
+    userService: IUserService = new UserService(),
+    photoRepos: IPhotoRepository = new PhotoRepository(),
+  ) {
     super();
     this.userService = userService;
+    this.photoRepos = photoRepos;
   }
   handle = async (command: ClearUserDataCommand) => {
     // delete failed photo
     console.log(`Deleting failed photos at ${new Date()}`);
-    const photos = await photo_repo.findAll(
+    const photos = await this.photoRepos.findAll(
       Where.expr(`status = ${PHOTO_STATUS_NORMAL}`),
     );
-    photos.forEach(async (photo) => {
+    photos.forEach(async (photo: PhotoModel) => {
       try {
         const res = await fetch(photo.url ?? "");
 
@@ -38,30 +46,10 @@ class ClearUserDataCommandHandler extends CommandHandler {
               res.headers.get("content-type") ?? "",
             ) !== true
         ) {
-          await photo_repo.delete(Where.expr(`id = ${photo.id}`));
+          await this.photoRepos.delete(Where.expr(`id = ${photo.id}`));
         }
       } catch (error) {
-        await photo_repo.delete(Where.expr(`id = ${photo.id}`));
-      }
-    });
-
-    // Delete user don't have image
-    console.log(`Deleting users don't have any photos at ${new Date()}`);
-    const partners = await user_repo.findAll(
-      Where.expr(`status = ${USER_STATUS_DRAFT}`),
-    );
-
-    partners.forEach(async (partner) => {
-      const photosOfUser = await photo_repo.findAll(
-        Where.expr(`user_id = ${partner.id ?? 0}`),
-      );
-
-      if (photosOfUser.length === 0) {
-        // raise hating this user
-        if (partner.refId !== null) {
-          await this.userService.hateUserAction(partner.refId ?? "");
-        }
-        await user_repo.delete(Where.expr(`id = ${partner.id ?? 0}`));
+        await this.photoRepos.delete(Where.expr(`id = ${photo.id}`));
       }
     });
   };

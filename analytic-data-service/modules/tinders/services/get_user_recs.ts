@@ -1,5 +1,4 @@
 import { AUTH_TOKEN, USER_RECS_API } from "../../../common/contants.ts";
-import user_repo from "../domain/repositories/user_repo.ts";
 
 const get_user_recs = async () => {
   const recs_response = await fetch(USER_RECS_API, {

@@ -1,12 +1,17 @@
 import { MEDIA_FILE_DIR } from "../../../../common/contants.ts";
-import photo_repo from "../../domain/repositories/photo_repo.ts";
 import { ensureDir, Where } from "../../../../deps.ts";
 import { PHOTO_STATUS_LIKE } from "../../domain/contants.ts";
+import {
+  IPhotoRepository,
+  PhotoRepository,
+} from "../../domain/repositories/photoRepository.ts";
 
-const sync_medifile_to_system_command = async () => {
+const sync_medifile_to_system_command = async (
+  photoRepos: IPhotoRepository = new PhotoRepository(),
+) => {
   await ensureDir(MEDIA_FILE_DIR);
 
-  const photos = await photo_repo.findAll(
+  const photos = await photoRepos.findAll(
     Where.expr(`is_synced = 0 and status = ${PHOTO_STATUS_LIKE}`),
   );
 
@@ -19,7 +24,7 @@ const sync_medifile_to_system_command = async () => {
     await write_file_url_to_disk(synced_photo.url ?? "", MEDIA_FILE_DIR);
 
     synced_photo.is_synced = 1;
-    await photo_repo.update(synced_photo);
+    await photoRepos.update(synced_photo);
 
     photoCounter++;
     if (photoCounter === photos.length) {
