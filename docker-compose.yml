@@ -33,7 +33,7 @@ services:
     container_name: ms-analytic-data-service
     restart: always
     build: ./analytic-data-service
-    command: run --allow-net --allow-read --allow-write --allow-env --unstable -c tsconfig.json app.ts
+    command: run --reload --allow-net --allow-read --allow-write --allow-env --unstable -c tsconfig.json app.ts
     environment:
       ANALYTIC_DB_USER: ${ANALYTIC_DATA_SERVICE_USER}
       ANALYTIC_DB_NAME: ${ANALYTIC_DATA_SERVICE_DB}
@@ -76,6 +76,24 @@ services:
       - ms-freetime-network
     depends_on:
       - ms-mysql-db
+
+  ms-cms:
+    container_name: ms-cms
+    build:
+      context: ./ms-cms
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_ANALYTIC_BACKEND_API=${ANALYTIC_BACKEND_API}
+    ports:
+      - ${MS_CMS_PORT}:5000
+    networks:
+      - ms-freetime-network
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./ms-cms:/usr/app
+    depends_on:
+      - analytic-data-service
 
   data-science-service:
     container_name: data-science-service
