@@ -36,19 +36,23 @@ const sync_medifile_to_system_command = async (
 };
 
 const write_file_url_to_disk = async (file_url: string, file_path: string) => {
-  const res = await fetch(
-    file_url,
-  );
-
-  const contentType: Array<String> = (res.headers.get("content-type") ?? "")
-    .split("/");
-
-  if (contentType.length > 1 && contentType[0] === "image") {
-    const imageBytes = new Uint8Array(await res.arrayBuffer());
-    await Deno.writeFile(
-      `${file_path}/synced_image_${Date.now()}.${contentType[1]}`,
-      imageBytes,
+  try {
+    const res = await fetch(
+      file_url,
     );
+
+    const contentType: Array<String> = (res.headers.get("content-type") ?? "")
+      .split("/");
+
+    if (contentType.length > 1 && contentType[0] === "image") {
+      const imageBytes = new Uint8Array(await res.arrayBuffer());
+      await Deno.writeFile(
+        `${file_path}/synced_image_${Date.now()}.${contentType[1]}`,
+        imageBytes,
+      );
+    }
+  } catch (error) {
+    console.log(`Can't write ${file_url} to the system`);
   }
 };
 
