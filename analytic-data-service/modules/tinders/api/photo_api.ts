@@ -10,8 +10,8 @@ const bus: Bus = new Bus();
 
 const getPhotoList = async (ctx: any) => {
   const params = getQuery(ctx, { mergeParams: true });
-  const start: number = Number(params["_start"]) ?? -1;
-  const end: number = Number(params["_end"]) ?? -1;
+  const start: number = Number(params["_start"]) ?? 0;
+  const end: number = Number(params["_end"]) ?? 10 ** 6;
 
   const dataResponse: ListPaging = await bus.dispatch(
     new GetPhotoListQuery(start, end),

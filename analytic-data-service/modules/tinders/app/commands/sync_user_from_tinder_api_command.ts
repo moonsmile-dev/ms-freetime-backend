@@ -72,7 +72,7 @@ const sync_user_from_tinder_api_command = async (
                   user_id: BigInt(user_id),
                   status: PHOTO_STATUS_NORMAL,
                   metadata: JSON.stringify(
-                    { processedFiles: photo_data["processedFiles"] },
+                    { photoProfiles: photo_data["processedFiles"] },
                   ),
                 });
               }

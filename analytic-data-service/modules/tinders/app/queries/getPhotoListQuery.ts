@@ -40,6 +40,7 @@ class GetPhotoListQueryHandler extends QueryHandler {
         url: item.url ?? "",
         id: item.id ?? -1,
         userId: item.user_id ?? BigInt(-1),
+        metadata: JSON.parse(item.metadata)["photoProfiles"] ?? [],
       };
     });
     return new ListPaging(photoDtos, photos.length);
