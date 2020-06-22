@@ -35,7 +35,7 @@ class GetPhotoListQueryHandler extends QueryHandler {
       Where.expr(`status = ${PHOTO_STATUS_NORMAL}`),
     );
 
-    const photoDtos: Array<PhotoDTO> = photos.slice(start, end).map((item) => {
+    const photoDtos: Array<PhotoDTO> = photos.slice(start, end > photos.length ? photos.length : end).map((item) => {
       return {
         url: item.url ?? "",
         id: item.id ?? -1,

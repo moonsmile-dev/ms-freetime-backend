@@ -19,7 +19,7 @@ import {
 
 const sync_user_from_tinder_api_command = async (
   userRepos: IUserRepository = new UserRepository(),
-  photoRepos: IPhotoRepository = new PhotoRepository(),
+  photoRepos: IPhotoRepository = new PhotoRepository()
 ) => {
   const user_recs_data = await get_user_recs();
   let updatedUserCounter: number = 0;
@@ -37,11 +37,44 @@ const sync_user_from_tinder_api_command = async (
         const refId: string = user_data["_id"];
         const gender: number = Number(user_data["gender"] ?? 0);
         const existedUser = await userRepos.findOne(
-          Where.from({ ref_id: refId }),
+          Where.from({ ref_id: refId })
         );
 
         if (existedUser && gender === GENDER_FEMALE) {
-          // TODO sync data
+          user_data["photos"].forEach(async (photoData: any) => {
+            const existedPhoto = await photoRepos.findByUserIdAndRefId(
+              String(existedUser.id),
+              photoData["id"].slice(0, 8)
+            );
+
+            if (existedPhoto) {
+              existedPhoto.url = photoData["url"];
+              existedPhoto.metadata = JSON.stringify({
+                photoProfiles: photoData["processedFiles"],
+              });
+
+              existedPhoto.url = photoData["url"];
+              existedPhoto.metadata = JSON.stringify({
+                photoProfiles: photoData["processedFiles"],
+              });
+
+              photoRepos.update(existedPhoto);
+            } else {
+              const refId: string = String(photoData["id"]).slice(0, 8);
+
+              if (refId !== "unknown" && isValidedUrl(photoData["url"])) {
+                photoRepos.insert({
+                  refId: refId,
+                  url: photoData["url"],
+                  user_id: BigInt(existedUser.id),
+                  status: PHOTO_STATUS_NORMAL,
+                  metadata: JSON.stringify({
+                    photoProfiles: photoData["processedFiles"],
+                  }),
+                });
+              }
+            }
+          });
 
           updatedUserCounter++;
           if (updatedUserCounter + addedUserCounter === totalSyncedUser) {
@@ -55,29 +88,24 @@ const sync_user_from_tinder_api_command = async (
             distance_mi: user_data["distance_mi"],
             birth_date: BigInt(
               Date.parse(user_data["birth_date"] ?? Date.now().toString()) ??
-                Date.now(),
+                Date.now()
             ),
             status: USER_STATUS_DRAFT,
           });
 
           user_data["photos"].forEach(async (photo_data: any) => {
             const refId: string = String(photo_data["id"]).slice(0, 8);
-            try {
-              const resUrl = await fetch(photo_data["url"] ?? "");
 
-              if (refId !== "unknown" && resUrl.status === 200) {
-                photoRepos.insert({
-                  refId: refId,
-                  url: photo_data["url"],
-                  user_id: BigInt(user_id),
-                  status: PHOTO_STATUS_NORMAL,
-                  metadata: JSON.stringify(
-                    { photoProfiles: photo_data["processedFiles"] },
-                  ),
-                });
-              }
-            } catch (error) {
-              console.log(`Can't request to url: ${photo_data["url"]}`);
+            if (refId !== "unknown" && isValidedUrl(photo_data["url"])) {
+              photoRepos.insert({
+                refId: refId,
+                url: photo_data["url"],
+                user_id: BigInt(user_id),
+                status: PHOTO_STATUS_NORMAL,
+                metadata: JSON.stringify({
+                  photoProfiles: photo_data["processedFiles"],
+                }),
+              });
             }
           });
 
@@ -91,6 +119,20 @@ const sync_user_from_tinder_api_command = async (
       }
     });
   });
+};
+
+const isValidedUrl = async (url: string | undefined): Promise<boolean> => {
+  try {
+    const res = await fetch(url ?? "");
+
+    if (res.status === 200) {
+      return true;
+    }
+  } catch (error) {
+    console.log(`Can't request to url: ${url}.`);
+  }
+
+  return false;
 };
 
 export default sync_user_from_tinder_api_command;
