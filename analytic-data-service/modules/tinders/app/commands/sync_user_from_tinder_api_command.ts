@@ -66,11 +66,14 @@ const sync_user_from_tinder_api_command = async (
               const resUrl = await fetch(photo_data["url"] ?? "");
 
               if (refId !== "unknown" && resUrl.status === 200) {
-                await photoRepos.insert({
+                photoRepos.insert({
                   refId: refId,
                   url: photo_data["url"],
                   user_id: BigInt(user_id),
                   status: PHOTO_STATUS_NORMAL,
+                  metadata: JSON.stringify(
+                    { processedFiles: photo_data["processedFiles"] },
+                  ),
                 });
               }
             } catch (error) {
