@@ -32,6 +32,9 @@ class PhotoModel extends BaseModel {
 
   @Field({ type: FieldType.INT, notNull: true, default: 0 })
   is_synced!: number;
+
+  @Field({ type: FieldType.STRING, notNull: true, default: "{}" })
+  metadata!: string;
 }
 
 export default PhotoModel;
