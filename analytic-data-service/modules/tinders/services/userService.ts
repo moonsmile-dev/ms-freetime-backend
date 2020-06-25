@@ -3,6 +3,7 @@ import {
   AUTH_TOKEN,
   USER_LIKE_API,
   USER_LOCATION_API,
+  USER_PROFILE_API,
 } from "../../../common/contants.ts";
 import { FormatString } from "../../../common/strings.ts";
 
@@ -18,6 +19,7 @@ interface IUserService {
   changeLocationAction: (
     data: Location,
   ) => Promise<boolean>;
+  getUserProfile: () => Promise<any>;
 }
 
 class UserService implements IUserService {
@@ -106,6 +108,31 @@ class UserService implements IUserService {
       return false;
     }
     return true;
+  };
+
+  getUserProfile = async (): Promise<any> => {
+    console.log("Implementing get user profile");
+
+    try {
+      const res = await fetch(USER_PROFILE_API, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Auth-Token": AUTH_TOKEN,
+        },
+      });
+
+      if (res.status < 200 || res.status >= 300) {
+        console.log("Can't get user profile");
+
+        throw Error();
+      }
+
+      return res.json();
+    } catch (error) {
+      console.log("Can't get user profile");
+      throw Error("Can't fetch user profile");
+    }
   };
 }
 
