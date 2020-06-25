@@ -16,10 +16,20 @@ import {
   IPhotoRepository,
   PhotoRepository,
 } from "../../domain/repositories/photoRepository.ts";
+import { IUserService, UserService } from "../../services/userService.ts";
+import {
+  ILocationRepository,
+  LocationRepository,
+} from "../../domain/repositories/locationRepository.ts";
+import { Bus } from "../../../../common/bus.ts";
+import ChangeUserLocationCommand from "./changeUserLocationCommand.ts";
 
 const sync_user_from_tinder_api_command = async (
   userRepos: IUserRepository = new UserRepository(),
-  photoRepos: IPhotoRepository = new PhotoRepository()
+  photoRepos: IPhotoRepository = new PhotoRepository(),
+  userService: IUserService = new UserService(),
+  locationRepos: ILocationRepository = new LocationRepository(),
+  bus: Bus = new Bus(),
 ) => {
   const user_recs_data = await get_user_recs();
   let updatedUserCounter: number = 0;
@@ -31,20 +41,23 @@ const sync_user_from_tinder_api_command = async (
     console.log(`${updated} users are updated and ${added} users are added.`);
   };
 
-  await dso.transaction(async (trans) => {
+  // change location
+  const location = await bus.dispatch(new ChangeUserLocationCommand());
+
+  return dso.transaction(async (trans) => {
     user_recs_data.forEach(async (user_data: any) => {
       try {
         const refId: string = user_data["_id"];
         const gender: number = Number(user_data["gender"] ?? 0);
         const existedUser = await userRepos.findOne(
-          Where.from({ ref_id: refId })
+          Where.from({ ref_id: refId }),
         );
 
         if (existedUser && gender === GENDER_FEMALE) {
           user_data["photos"].forEach(async (photoData: any) => {
             const existedPhoto = await photoRepos.findByUserIdAndRefId(
               String(existedUser.id),
-              photoData["id"].slice(0, 8)
+              photoData["id"].slice(0, 8),
             );
 
             if (existedPhoto) {
@@ -88,9 +101,16 @@ const sync_user_from_tinder_api_command = async (
             distance_mi: user_data["distance_mi"],
             birth_date: BigInt(
               Date.parse(user_data["birth_date"] ?? Date.now().toString()) ??
-                Date.now()
+                Date.now(),
             ),
             status: USER_STATUS_DRAFT,
+          });
+
+          locationRepos.insert({
+            latitude: String(location["lat"]),
+            longitude: String(location["lon"]),
+            name: location["name"],
+            user_id: user_id,
           });
 
           user_data["photos"].forEach(async (photo_data: any) => {
