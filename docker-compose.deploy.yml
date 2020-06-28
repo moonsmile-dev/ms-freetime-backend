@@ -1,0 +1,78 @@
+version: "3.7"
+
+services:
+  ms-mysql-db-prod:
+    container_name: ms-mysql-db-prod
+    image: kakavip198kaka/ms-mysql-db:0.0.1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    ports:
+      - ${MYSQL_DATABASE_PORT}:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - ms-network-prod
+
+  analytic-data-service:
+    container_name: ms-analytic-data-service
+    image: kakavip198kaka/analytic-data-service:0.0.1
+    command: run --reload --allow-net --allow-read --allow-write --allow-env --unstable -c tsconfig.json app.ts
+    environment:
+      ANALYTIC_DB_USER: ${ANALYTIC_DATA_SERVICE_USER}
+      ANALYTIC_DB_NAME: ${ANALYTIC_DATA_SERVICE_DB}
+      ANALYTIC_DB_PASSWORD: ${ANALYTIC_DATA_SERVICE_PASSWORD}
+      # ANALYTIC_DB_PORT: ${ANALYTIC_DATA_SERVICE_DB_PORT}
+      # ANALYTIC_DB_HOST: ${ANALYTIC_DATA_SERVICE_HOST}
+      ANALYTIC_DB_PORT: 3306
+      ANALYTIC_DB_HOST: ms-mysql-db-prod
+    volumes:
+      - analytic-data-service_src:/usr/app
+      - mediafile_prod_data:/usr/app/mediafiles
+    ports:
+      - ${ANALYTIC_DATA_SERVICE_PORT}:3000
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "100M"
+        reservations:
+          cpus: "0.05"
+          memory: "60M"
+      # endpoint_mode: dnsrr
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - ms-mysql-db-prod
+    networks:
+      - ms-network-prod
+
+  ms-cms-prod:
+    container_name: ms-cms-prod
+    image: kakavip198kaka/ms-cms:0.0.1
+    build:
+      context: ./ms-cms
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_ANALYTIC_BACKEND_API=${ANALYTIC_BACKEND_API}
+    ports:
+      - ${MS_CMS_PORT}:5000
+    networks:
+      - ms-network-prod
+    environment:
+      REACT_APP_ANALYTIC_BACKEND_API: ${ANALYTIC_BACKEND_API}
+      NODE_ENV: development
+    depends_on:
+      - analytic-data-service
+
+networks:
+  ms-network-prod:
+    driver: overlay
+    attachable: true
+
+volumes:
+  mysql_prod_data:
+  mediafile_prod_data:
+  analytic-data-service_src:

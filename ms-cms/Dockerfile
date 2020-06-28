@@ -5,7 +5,7 @@ FROM node:8
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
-ARG REACT_APP_ANALYTIC_BACKEND_API=""
+ARG REACT_APP_ANALYTIC_BACKEND_API=${ANALYTIC_BACKEND_API}
 
 # Install and configure `serve`.
 RUN npm install -g serve
