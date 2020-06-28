@@ -24,7 +24,7 @@ class ClearUserDataCommandHandler extends CommandHandler {
   photoRepos: IPhotoRepository;
   constructor(
     userService: IUserService = new UserService(),
-    photoRepos: IPhotoRepository = new PhotoRepository(),
+    photoRepos: IPhotoRepository = new PhotoRepository()
   ) {
     super();
     this.userService = userService;
@@ -34,18 +34,13 @@ class ClearUserDataCommandHandler extends CommandHandler {
     // delete failed photo
     console.log(`Deleting failed photos at ${new Date()}`);
     const photos = await this.photoRepos.findAll(
-      Where.expr(`status = ${PHOTO_STATUS_NORMAL}`),
+      Where.expr(`status = ${PHOTO_STATUS_NORMAL}`)
     );
     photos.forEach(async (photo: PhotoModel) => {
       try {
         const res = await fetch(photo.url ?? "");
 
-        if (
-          res.status !== 200 ||
-          new RegExp("image/*").test(
-              res.headers.get("content-type") ?? "",
-            ) !== true
-        ) {
+        if (res.status !== 200) {
           await this.photoRepos.delete(Where.expr(`id = ${photo.id}`));
         }
       } catch (error) {

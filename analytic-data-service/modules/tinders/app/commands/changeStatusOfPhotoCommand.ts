@@ -39,7 +39,7 @@ class ChangeStatusOfPhotoCommandHandler extends CommandHandler {
     ) {
       photo!.status = command.status;
 
-      await this.photoRepos.update(photo!);
+      this.photoRepos.update(photo!);
     } else {
       throw Error(`The status ${command.status} isn't existed.`);
     }

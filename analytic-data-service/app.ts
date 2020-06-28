@@ -17,11 +17,11 @@ import ChangeUserLocationCommand from "./modules/tinders/app/commands/changeUser
 
 const runBackgroundJob = async () => {
   const jobHandler: IJobHandler = new JobHandler();
+  // jobHandler.run(changeUserLocationJob);
   jobHandler.run(sync_mediafile_to_system_job);
-  jobHandler.run(sync_recs_user_from_tinder_api_job);
-  jobHandler.run(clearUserDataJob);
+  // jobHandler.run(clearUserDataJob);
   jobHandler.run(syncReactingUserJob);
-  jobHandler.run(changeUserLocationJob);
+  jobHandler.run(sync_recs_user_from_tinder_api_job);
   // await sync_recs_user_from_tinder_api_job();
   // await sync_mediafile_to_system_job();
 };
@@ -51,7 +51,7 @@ const onStartUp = async () => {
   const bus: Bus = new Bus();
 
   // change user location
-  await bus.dispatch(new ChangeUserLocationCommand());
+  // await bus.dispatch(new ChangeUserLocationCommand());
 };
 
 const main = async () => {
