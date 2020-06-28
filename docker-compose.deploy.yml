@@ -4,6 +4,7 @@ services:
   ms-mysql-db-prod:
     container_name: ms-mysql-db-prod
     image: kakavip198kaka/ms-mysql-db:0.0.1
+    build: ./database
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
@@ -16,6 +17,7 @@ services:
 
   analytic-data-service:
     container_name: ms-analytic-data-service
+    build: ./analytic-data-service
     image: kakavip198kaka/analytic-data-service:0.0.1
     command: run --reload --allow-net --allow-read --allow-write --allow-env --unstable -c tsconfig.json app.ts
     environment:
@@ -27,7 +29,6 @@ services:
       ANALYTIC_DB_PORT: 3306
       ANALYTIC_DB_HOST: ms-mysql-db-prod
     volumes:
-      - analytic-data-service_src:/usr/app
       - mediafile_prod_data:/usr/app/mediafiles
     ports:
       - ${ANALYTIC_DATA_SERVICE_PORT}:3000
@@ -36,11 +37,11 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: "0.2"
-          memory: "100M"
+          cpus: "0.5"
+          memory: "200M"
         reservations:
-          cpus: "0.05"
-          memory: "60M"
+          cpus: "0.25"
+          memory: "180M"
       # endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
@@ -75,4 +76,3 @@ networks:
 volumes:
   mysql_prod_data:
   mediafile_prod_data:
-  analytic-data-service_src:
