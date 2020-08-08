@@ -5,7 +5,7 @@ import {
   DB_PASSWORD,
   DB_NAME,
 } from "./common/contants.ts";
-import { ClientMySQL } from "https://deno.land/x/nessie@v1.0.0/mod.ts";
+import { ClientMySQL } from "https://deno.land/x/nessie@v1.0.4/mod.ts";
 
 /** These are the default config options. */
 const clientOptions = {

@@ -1,13 +1,12 @@
-import { Migration } from "https://deno.land/x/nessie/mod.ts";
-import { Schema } from "https://deno.land/x/nessie/qb.ts";
-import Dex from "https://deno.land/x/dex/mod.ts";
+import { Migration } from "https://deno.land/x/nessie@v1.0.4/mod.ts";
+import { Schema } from "https://deno.land/x/nessie@v1.0.4/qb.ts";
 
 /** Runs on migrate */
 export const up: Migration<Schema> = ({ queryBuilder }) => {
   // return new Schema()
   // return Dex
   queryBuilder.queryString(
-    "alter table photos add column is_synced integer default 0;",
+    "alter table photos add column is_synced integer default 0;"
   );
   return queryBuilder.query;
 };
