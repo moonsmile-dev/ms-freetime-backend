@@ -1,4 +1,4 @@
-import get_user_recs from "../../services/get_user_recs.ts";
+import getUserRecs from "../../services/getUserRecs.ts";
 
 import { getStringOrDefault } from "../../../../common/strings.ts";
 import {
@@ -24,18 +24,19 @@ import {
 import { Bus } from "../../../../common/bus.ts";
 import ChangeUserLocationCommand from "./changeUserLocationCommand.ts";
 
-const sync_user_from_tinder_api_command = async (
+const syncUserFromDatingApiCommand = async (
   userRepos: IUserRepository = new UserRepository(),
   photoRepos: IPhotoRepository = new PhotoRepository(),
   userService: IUserService = new UserService(),
   locationRepos: ILocationRepository = new LocationRepository(),
-  bus: Bus = new Bus(),
+  bus: Bus = new Bus()
 ) => {
-  const user_recs_data = await get_user_recs();
+  const user_recs_data = await getUserRecs();
   let updatedUserCounter: number = 0;
   let addedUserCounter: number = 0;
 
   const totalSyncedUser: number = user_recs_data.length;
+  console.log(`Starting sync ${totalSyncedUser} to the system.`);
 
   const finisedLogging = (updated: number, added: number) => {
     console.log(`${updated} users are updated and ${added} users are added.`);
@@ -50,14 +51,14 @@ const sync_user_from_tinder_api_command = async (
         const refId: string = user_data["_id"];
         const gender: number = Number(user_data["gender"] ?? 0);
         const existedUser = await userRepos.findOne(
-          Where.from({ ref_id: refId }),
+          Where.from({ ref_id: refId })
         );
 
         if (existedUser && gender === GENDER_FEMALE) {
           user_data["photos"].forEach(async (photoData: any) => {
             const existedPhoto = await photoRepos.findByUserIdAndRefId(
               String(existedUser.id),
-              photoData["id"].slice(0, 8),
+              photoData["id"].slice(0, 8)
             );
 
             if (existedPhoto) {
@@ -101,7 +102,7 @@ const sync_user_from_tinder_api_command = async (
             distance_mi: user_data["distance_mi"],
             birth_date: BigInt(
               Date.parse(user_data["birth_date"] ?? Date.now().toString()) ??
-                Date.now(),
+                Date.now()
             ),
             status: USER_STATUS_DRAFT,
           });
@@ -155,4 +156,4 @@ const isValidedUrl = async (url: string | undefined): Promise<boolean> => {
   return false;
 };
 
-export default sync_user_from_tinder_api_command;
+export default syncUserFromDatingApiCommand;

@@ -2,17 +2,17 @@ import timer from "./middleware/timer.ts";
 import logger from "./middleware/logger.ts";
 import error from "./middleware/error.ts";
 import { initOrm } from "./modules/core/orm.config.ts";
-import { sync_recs_user_from_tinder_api_job } from "./modules/tinders/jobs/sync_recs_user_from_tinder_api_job.ts";
-import { sync_mediafile_to_system_job } from "./modules/tinders/jobs/sync_mediafile_to_system_job.ts";
+import { syncRecsUserFromDatingApiJob } from "./modules/datings/jobs/syncRecsUserFromDatingApiJob.ts";
+import { sync_mediafile_to_system_job } from "./modules/datings/jobs/sync_mediafile_to_system_job.ts";
 
 import { Application, Router, oakCors } from "./deps.ts";
-import tinderRouter from "./modules/tinders/routes.ts";
+import datingRouter from "./modules/datings/routes.ts";
 import { IJobHandler, JobHandler } from "./common/jobHandler.ts";
-import clearUserDataJob from "./modules/tinders/jobs/clearUserDataJob.ts";
-import syncReactingUserJob from "./modules/tinders/jobs/syncReactingUserJob.ts";
-import changeUserLocationJob from "./modules/tinders/jobs/changeUserLocationJob.ts";
+import clearUserDataJob from "./modules/datings/jobs/clearUserDataJob.ts";
+import syncReactingUserJob from "./modules/datings/jobs/syncReactingUserJob.ts";
+import changeUserLocationJob from "./modules/datings/jobs/changeUserLocationJob.ts";
 import { Bus } from "./common/bus.ts";
-import ChangeUserLocationCommand from "./modules/tinders/app/commands/changeUserLocationCommand.ts";
+import ChangeUserLocationCommand from "./modules/datings/app/commands/changeUserLocationCommand.ts";
 
 const runBackgroundJob = async () => {
   const jobHandler: IJobHandler = new JobHandler();
@@ -20,13 +20,13 @@ const runBackgroundJob = async () => {
   // jobHandler.run(sync_mediafile_to_system_job);
   // jobHandler.run(clearUserDataJob);
   jobHandler.run(syncReactingUserJob);
-  jobHandler.run(sync_recs_user_from_tinder_api_job);
-  // await sync_recs_user_from_tinder_api_job();
+  jobHandler.run(syncRecsUserFromDatingApiJob);
+  // await syncRecsUserFromDatingApiJob();
   // await sync_mediafile_to_system_job();
 };
 
 const runRouters = (app: Application) => {
-  app.use(tinderRouter.routes());
+  app.use(datingRouter.routes());
 };
 
 const settingCors = (app: Application) => {

@@ -12,14 +12,25 @@ services:
     ports:
       - ${MYSQL_DATABASE_PORT}:3306
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    networks:
-      - ms-network-prod
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: "200M"
+        reservations:
+          cpus: "0.04"
+          memory: "180M"
+      # endpoint_mode: dnsrr
+      restart_policy:
+        condition: on-failure
 
   analytic-data-service:
     container_name: ms-analytic-data-service
     build: ./analytic-data-service
     image: kakavip198kaka/analytic-data-service:0.0.1
-    command: run --reload --allow-net --allow-read --allow-write --allow-env --unstable -c tsconfig.json app.ts
+    command: run --allow-net --allow-read --allow-write --allow-env --unstable -c tsconfig.json app.ts
     environment:
       ANALYTIC_DB_USER: ${ANALYTIC_DATA_SERVICE_USER}
       ANALYTIC_DB_NAME: ${ANALYTIC_DATA_SERVICE_DB}
@@ -28,8 +39,7 @@ services:
       # ANALYTIC_DB_HOST: ${ANALYTIC_DATA_SERVICE_HOST}
       ANALYTIC_DB_PORT: 3306
       ANALYTIC_DB_HOST: ms-mysql-db-prod
-    volumes:
-      - mediafile_prod_data:/usr/app/mediafiles
+      ANALYTIC_AUTH_TOKEN: ${ANALYTIC_AUTH_TOKEN}
     ports:
       - ${ANALYTIC_DATA_SERVICE_PORT}:3000
     deploy:
@@ -37,18 +47,16 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: "0.5"
-          memory: "200M"
+          cpus: "0.05"
+          memory: "300M"
         reservations:
-          cpus: "0.25"
-          memory: "180M"
+          cpus: "0.04"
+          memory: "280M"
       # endpoint_mode: dnsrr
       restart_policy:
         condition: on-failure
     depends_on:
       - ms-mysql-db-prod
-    networks:
-      - ms-network-prod
 
   ms-cms-prod:
     container_name: ms-cms-prod
@@ -60,16 +68,31 @@ services:
         - REACT_APP_ANALYTIC_BACKEND_API=${ANALYTIC_BACKEND_API}
     ports:
       - ${MS_CMS_PORT}:5000
-    networks:
-      - ms-network-prod
+    # volumes:
+    #   - ./wait-for-it.sh:./wait-for-it.sh
     environment:
       REACT_APP_ANALYTIC_BACKEND_API: ${ANALYTIC_BACKEND_API}
       NODE_ENV: development
     depends_on:
       - analytic-data-service
 
+    # command: ./wait-for-it.sh analytic-data-service:3000 && npm run build --production
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: "50M"
+        reservations:
+          cpus: "0.04"
+          memory: "40M"
+      # endpoint_mode: dnsrr
+      restart_policy:
+        condition: on-failure
+
 networks:
-  ms-network-prod:
+  default:
     driver: overlay
     attachable: true
 

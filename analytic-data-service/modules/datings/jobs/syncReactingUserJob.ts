@@ -7,7 +7,7 @@ const bus: Bus = new Bus();
 const syncReactingUserJob = async () => {
   await hourly(async () => {
     console.log(
-      `Start running job: sync reacting user job to Tinder system at ${new Date()}`,
+      `Start running job: sync reacting user job to Dating system at ${new Date()}`
     );
 
     await bus.dispatch(new SyncReactingUserCommand());

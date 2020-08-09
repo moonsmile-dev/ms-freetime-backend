@@ -1,6 +1,8 @@
 import { AUTH_TOKEN, USER_RECS_API } from "../../../common/contants.ts";
 
-const get_user_recs = async () => {
+const getUserRecs = async () => {
+  console.log(`Start requesting to api: ${USER_RECS_API}`);
+
   const recs_response = await fetch(USER_RECS_API, {
     method: "GET",
     headers: {
@@ -13,7 +15,13 @@ const get_user_recs = async () => {
     return response_data["results"];
   }
 
-  throw Error(`Can't connect to Tinder API: ${USER_RECS_API}`);
+  let error_message: string = response_data["error"] ?? "";
+
+  throw Error(
+    `Can't connect to Dating API: ${USER_RECS_API} due to ${JSON.stringify(
+      response_data
+    )}`
+  );
 };
 
-export default get_user_recs;
+export default getUserRecs;
