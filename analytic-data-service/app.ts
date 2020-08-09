@@ -1,7 +1,6 @@
 import timer from "./middleware/timer.ts";
 import logger from "./middleware/logger.ts";
 import error from "./middleware/error.ts";
-import { success } from "./common/responses.ts";
 import { initOrm } from "./modules/core/orm.config.ts";
 import { sync_recs_user_from_tinder_api_job } from "./modules/tinders/jobs/sync_recs_user_from_tinder_api_job.ts";
 import { sync_mediafile_to_system_job } from "./modules/tinders/jobs/sync_mediafile_to_system_job.ts";
@@ -18,7 +17,7 @@ import ChangeUserLocationCommand from "./modules/tinders/app/commands/changeUser
 const runBackgroundJob = async () => {
   const jobHandler: IJobHandler = new JobHandler();
   // jobHandler.run(changeUserLocationJob);
-  jobHandler.run(sync_mediafile_to_system_job);
+  // jobHandler.run(sync_mediafile_to_system_job);
   // jobHandler.run(clearUserDataJob);
   jobHandler.run(syncReactingUserJob);
   jobHandler.run(sync_recs_user_from_tinder_api_job);
@@ -37,7 +36,7 @@ const settingCors = (app: Application) => {
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       preflightContinue: false,
       optionsSuccessStatus: 204,
-    }),
+    })
   );
 };
 
@@ -56,20 +55,20 @@ const onStartUp = async () => {
 
 const main = async () => {
   const app = new Application();
-  const router = new Router();
 
   // middleware
   runMiddleware(app);
-  // run routers
-  runRouters(app);
   // cors
   settingCors(app);
+  // run routers
+  runRouters(app);
+
+  // init database
+  await initOrm();
 
   // on start up
   await onStartUp();
 
-  // init database
-  await initOrm();
   // run background job
   await runBackgroundJob();
 

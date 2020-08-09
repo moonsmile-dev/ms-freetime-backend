@@ -32,17 +32,19 @@ class GetPhotoListQueryHandler extends QueryHandler {
     const end = query.end;
 
     const photos = await this.photoRepos.findAll(
-      Where.expr(`status = ${PHOTO_STATUS_NORMAL}`),
+      Where.expr(`status = ${PHOTO_STATUS_NORMAL}`)
     );
 
-    const photoDtos: Array<PhotoDTO> = photos.slice(start, end > photos.length ? photos.length : end).map((item) => {
-      return {
-        url: item.url ?? "",
-        id: item.id ?? -1,
-        userId: item.user_id ?? BigInt(-1),
-        metadata: JSON.parse(item.metadata)["photoProfiles"] ?? [],
-      };
-    });
+    const photoDtos: Array<PhotoDTO> = photos
+      .slice(start, end > photos.length ? photos.length : end)
+      .map((item) => {
+        return {
+          url: item.url ?? "",
+          id: item.id ?? -1,
+          userId: item.user_id ?? BigInt(-1),
+          metadata: JSON.parse(item.metadata)["photoProfiles"] ?? [],
+        };
+      });
     return new ListPaging(photoDtos, photos.length);
   };
 }

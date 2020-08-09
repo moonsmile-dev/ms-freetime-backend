@@ -8,7 +8,7 @@ import {
 import { dso } from "../../deps.ts";
 
 export const initOrm = async () => {
-  dso.connect({
+  await dso.connect({
     hostname: DB_HOSTNAME,
     port: DB_PORT,
     username: DB_USERNAME,

@@ -2,9 +2,9 @@ import sync_user_from_tinder_api_command from "../app/commands/sync_user_from_ti
 import { hourly, every15Minute, daily } from "../../../deps.ts";
 
 const sync_recs_user_from_tinder_api_job = async () => {
-  await daily(async () => {
+  await every15Minute(async () => {
     console.log(
-      `Start running job: sync user from tinder api at ${new Date()}`,
+      `Start running job: sync user from tinder api at ${new Date()}`
     );
     await sync_user_from_tinder_api_command();
   });

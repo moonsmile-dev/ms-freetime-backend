@@ -1,4 +1,4 @@
-export const AUTH_TOKEN = "8f8bb253-8b7a-4ab7-a17a-64d0d9144815";
+export const AUTH_TOKEN = Deno.env.get("ANALYTIC_AUTH_TOKEN") ?? "";
 
 export const DB_HOSTNAME: string = Deno.env.get("ANALYTIC_DB_HOST") ?? "";
 export const DB_PORT: number = Number(Deno.env.get("ANALYTIC_DB_PORT")) ?? -1;
